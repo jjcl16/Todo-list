@@ -1,29 +1,57 @@
 import Task from "./task";
+
 export function addNewTask(project, task) {
-  let projectTasks;
-  if (localStorage[project] != undefined) {
+  let projectTasks = localStorage[project];
+  if (
+    projectTasks != undefined &&
+    tasksCheckName(projectTasks, JSON.parse(task).title)
+  ) {
     projectTasks = localStorage[project];
     projectTasks += ">:/|/:<" + task;
     localStorage[project] = projectTasks;
-  } else {
+  } else if (projectTasks == undefined) {
     localStorage[project] = task;
   }
 }
 
-export function addParameters(project, taskName, description, dueDate, priority, check){
+function tasksCheckName(tasks, taskNameToCheck) {
+  let nameItsOK = true;
+  tasks = tasks.split(">:/|/:<");
+  tasks.forEach((task) => {
+    let taskComprare = JSON.parse(task);
+    nameItsOK &= taskComprare.title != taskNameToCheck ? true : false;
+  });
+  console.log(nameItsOK);
+  return nameItsOK;
+}
+
+export function addParameters(
+  project,
+  taskName,
+  description,
+  dueDate,
+  priority,
+  check
+) {
   let tasks = readAllTask(project);
+  let newTasks;
   console.log(tasks);
   for (let i = 0; i < tasks.length; i++) {
-   if (taskName == (JSON.parse(tasks[i]).title)) {
+    if (taskName == JSON.parse(tasks[i]).title) {
       let taskWithParameters = new Task(taskName);
-      taskWithParameters.setParameters( description, dueDate, priority, check);
+      taskWithParameters.setParameters(description, dueDate, priority, check);
       let jsonTask = JSON.stringify(taskWithParameters);
-      tasks.splice(i, 1, jsonTask);      
-      localStorage[project] = tasks;
-      console.log(localStorage[project]);
-      return tasks;  
-    } 
-  } 
+      tasks.splice(i, 1, jsonTask);
+      //return tasks;
+    }
+    if (i == 0) {
+      newTasks = tasks[i];
+    } else {
+      newTasks += ">:/|/:<" + tasks[i];
+    }
+  }
+  localStorage[project] = newTasks;
+  return newTasks;
 }
 
 export function readAllTask(project) {
@@ -33,16 +61,15 @@ export function readAllTask(project) {
   }
 }
 
-
-export function removeTask(project, taskName){
+export function removeTask(project, taskName) {
   let tasks = readAllTask(project);
   for (let i = 0; i < tasks.length; i++) {
     if (taskName == JSON.parse(tasks[i]).title) {
-      tasks.splice(i,1);      
+      tasks.splice(i, 1);
       localStorage[project] = tasks;
       return tasks;
-    }    
-  }   
+    }
+  }
 }
 
 export function readAllProjects() {
@@ -56,12 +83,64 @@ export function readAllProjects() {
 
 export function addNewProject(projectName) {
   let projects;
-  if (localStorage.projects != undefined) {
+  if (localStorage.projects != undefined && projectsCheckName(projectName)) {
     projects = localStorage.projects;
     projects = projects.split(",");
     projects.push(projectName);
     localStorage.projects = projects;
-  } else localStorage.projects = projectName;
+  } else if (projectsCheckName(projectName))
+    localStorage.projects = projectName;
+}
 
-  console.log(localStorage);
+function projectsCheckName(projectName) {
+  let projects;
+  let nameItsOK = true;
+  if (projectName != "projects") {
+    if (localStorage.projects != undefined) {
+      projects = localStorage.projects;
+      projects = projects.split(",");
+      projects.forEach((project) => {
+        nameItsOK &= project != projectName ? true : false;
+      });
+    }
+  } else {
+    nameItsOK = false;
+  }
+  return nameItsOK;
+}
+
+export function addParametersV2(project, task, param, value, checked) {
+  const tasks = readAllTask(project);
+  let newTasks;
+  console.log(tasks);
+  for (let i = 0; i < tasks.length; i++) {
+    if (task == JSON.parse(tasks[i]).title) {
+      const taskObject = Object.assign(new Task(), JSON.parse(tasks[i]));
+      //let taskObject = new Task(task)
+      switch (param) {
+        case "description":
+          taskObject.setDescription(value);
+          break;
+        case "dueDate":
+          taskObject.setDueDate(value);
+          break;
+        case "priority":
+          taskObject.setPriority(value);
+          break;
+        case "check":
+          taskObject.setCheck(checked);
+          break;
+      }
+      let jsonTask = JSON.stringify(taskObject);
+      console.log(jsonTask);
+      tasks.splice(i, 1, jsonTask);
+    }
+    if (i == 0) {
+      newTasks = tasks[i];
+    } else {
+      newTasks += ">:/|/:<" + tasks[i];
+    }
+  }
+  localStorage[project] = newTasks;
+  return newTasks;
 }
