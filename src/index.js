@@ -77,26 +77,13 @@ function insertNewProject() {
 }
 
 function loadDashboardFor(e) {  
-  console.log(e.currentTarget.value);
-  
-  loadDashboard(e.currentTarget.value);
-  //loadDashboard(e.target.innerText);
-  
-  //console.log(e)
+  loadDashboard(e.target.innerText);  
 }
 
 function loadDashboard(projectName) {
   while (dashboard.childNodes.length) {
     dashboard.removeChild(dashboard.lastChild);
   }
-  /*
-      <div id="projectTitle">Title</div>
-      <label for="taskName">Task Name:</label>
-      <input type="text" id="taskName">
-      <button id="insertTask"></button>
-      <button id="insertTaskParameters"></button>
-*/
-
   const projectTitle = document.createElement("div");
   projectTitle.setAttribute("id", "projectTitle");
 
@@ -149,6 +136,8 @@ function loadProjects() {
 function loadTasks() {
   let project = getProject();
   let tasks = readAllTask(project);
+
+
 
   tasks.forEach((task) => {
     const taskObject = Object.assign(new Task(), JSON.parse(task));
@@ -248,4 +237,8 @@ function removeProjectCall(e){
   const project = e.currentTarget.project;
   RemoveProject(project);
   loadProjects();
+  if (getProject() ==  project){
+    const projects = readAllProjects();
+    loadDashboard(projects[projects.length-1]);
+  }
 }
