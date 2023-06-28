@@ -63,22 +63,26 @@ export function readAllTask(project) {
 
 export function removeTask(project, taskName) {
   let tasks = readAllTask(project);
+  let newTasks;
   for (let i = 0; i < tasks.length; i++) {
     if (taskName == JSON.parse(tasks[i]).title) {
       tasks.splice(i, 1);
-      localStorage[project] = tasks;
-      return tasks;
+      //localStorage[project] = tasks;
+      //return tasks;
     }
+    if (i == 0) {
+      newTasks = tasks[i];
+    } else {
+      newTasks += ">:/|/:<" + tasks[i];
+    }    
   }
+  localStorage[project] = newTasks;
+  return newTasks;
 }
 
 export function readAllProjects() {
-  let projects = [];
-  if (localStorage.length) {
-    projects = localStorage.projects;
-    projects = projects.split(",");
-    return projects;
-  }
+  
+ return localStorage["projects"].split(",");
 }
 
 export function addNewProject(projectName) {
@@ -143,4 +147,16 @@ export function addParametersV2(project, task, param, value, checked) {
   }
   localStorage[project] = newTasks;
   return newTasks;
+}
+
+export function RemoveProject(project){
+  delete localStorage[project];
+
+  const projects = readAllProjects();
+  for (let i = 0; i < projects.length; i++) {
+    if (projects[i]== project){
+      projects.splice(i,1);
+    }    
+  }
+  localStorage["projects"] = projects;
 }
