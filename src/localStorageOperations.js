@@ -70,13 +70,17 @@ export function removeTask(project, taskName) {
       //localStorage[project] = tasks;
       //return tasks;
     }
-    if (i == 0) {
+    if (i == 0 && tasks[i] != undefined) {
       newTasks = tasks[i];
-    } else {
+    } else if (tasks[i] != undefined){
       newTasks += ">:/|/:<" + tasks[i];
-    }    
+    } else {
+      delete localStorage[project];
+    }   
   }
-  localStorage[project] = newTasks;
+  if(newTasks!= undefined){
+    localStorage[project] = newTasks;
+  }  
   return newTasks;
 }
 

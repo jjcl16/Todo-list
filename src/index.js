@@ -84,31 +84,33 @@ function loadDashboard(projectName) {
   while (dashboard.childNodes.length) {
     dashboard.removeChild(dashboard.lastChild);
   }
-  const projectTitle = document.createElement("div");
-  projectTitle.setAttribute("id", "projectTitle");
+  if (projectName){
+    const projectTitle = document.createElement("div");
+    projectTitle.setAttribute("id", "projectTitle");
 
-  const titleLabel = document.createElement("label");
-  titleLabel.setAttribute("for", "taskName");
-  titleLabel.textContent = "Task Name:";
+    const titleLabel = document.createElement("label");
+    titleLabel.setAttribute("for", "taskName");
+    titleLabel.textContent = "Task Name:";
 
-  const taskName = document.createElement("input");
-  taskName.setAttribute("type", "text");
-  taskName.setAttribute("id", "taskName");
+    const taskName = document.createElement("input");
+    taskName.setAttribute("type", "text");
+    taskName.setAttribute("id", "taskName");
 
-  const insertTaskButton = document.createElement("button");
-  insertTaskButton.setAttribute("id", "insertTask");
-  insertTaskButton.textContent = "Insert task";
-  insertTaskButton.addEventListener("click", insertTask);
-
- 
- projectTitle.textContent = projectName;
-
-  dashboard.appendChild(projectTitle);
-  dashboard.appendChild(titleLabel);
-  dashboard.appendChild(taskName);
-  dashboard.appendChild(insertTaskButton);
+    const insertTaskButton = document.createElement("button");
+    insertTaskButton.setAttribute("id", "insertTask");
+    insertTaskButton.textContent = "Insert Task";
+    insertTaskButton.addEventListener("click", insertTask);
+    
   
-  loadTasks();
+    projectTitle.textContent = projectName;
+
+    dashboard.appendChild(projectTitle);
+    dashboard.appendChild(titleLabel);
+    dashboard.appendChild(taskName);
+    dashboard.appendChild(insertTaskButton);
+    
+    loadTasks();
+  }
 }
 
 function loadProjects() {
@@ -125,7 +127,7 @@ function loadProjects() {
 
       const RemoveProjectButton = document.createElement("button");
       RemoveProjectButton.setAttribute("id", "RemoveProjectButton");
-      RemoveProjectButton.textContent = "Remove Project";
+      RemoveProjectButton.textContent = "🗑️";
       RemoveProjectButton.project = project;
       RemoveProjectButton.addEventListener("click", removeProjectCall);
       projectList.appendChild(RemoveProjectButton);
@@ -205,7 +207,7 @@ function loadTasks() {
  
     const RemoveTaskButton = document.createElement("button");
     RemoveTaskButton.setAttribute("id", "RemoveTaskButton");
-    RemoveTaskButton.textContent = "Remove task";
+    RemoveTaskButton.textContent = "🗑️";
     RemoveTaskButton.project = project;
     RemoveTaskButton.task = taskObject.title;
     RemoveTaskButton.addEventListener("click", removeTaskCall);
@@ -239,6 +241,7 @@ function removeProjectCall(e){
   loadProjects();
   if (getProject() ==  project){
     const projects = readAllProjects();
-    loadDashboard(projects[projects.length-1]);
+    //loadDashboard(projects[projects.length-1]);
+    loadDashboard();
   }
 }
