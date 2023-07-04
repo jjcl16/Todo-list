@@ -6,7 +6,7 @@ import {
   readAllTask,
   removeTask,
   addParametersV2,
-  RemoveProject
+  RemoveProject,
 } from "./localStorageOperations";
 import "./style.css";
 
@@ -39,22 +39,22 @@ function insertTask() {
 }
 
 function insertNewProject() {
-  let name = newProjectName.value;  
+  let name = newProjectName.value;
   if (name) {
     addNewProject(name);
     loadProjects();
   }
 }
 
-function loadDashboardFor(e) {  
-  loadDashboard(e.target.innerText);  
+function loadDashboardFor(e) {
+  loadDashboard(e.target.innerText);
 }
 
 function loadDashboard(projectName) {
   while (dashboard.childNodes.length) {
     dashboard.removeChild(dashboard.lastChild);
   }
-  if (projectName){
+  if (projectName) {
     const newTaskContainer = document.createElement("div");
     newTaskContainer.setAttribute("id", "newTaskContainer");
 
@@ -73,8 +73,8 @@ function loadDashboard(projectName) {
     const insertTaskButton = document.createElement("button");
     insertTaskButton.setAttribute("id", "insertTask");
     insertTaskButton.textContent = "✚";
-    insertTaskButton.addEventListener("click", insertTask);   
-  
+    insertTaskButton.addEventListener("click", insertTask);
+
     projectTitle.textContent = projectName;
 
     newTaskContainer.appendChild(projectTitle);
@@ -88,7 +88,7 @@ function loadDashboard(projectName) {
     tasksContainer.setAttribute("id", "tasksContainer");
 
     dashboard.appendChild(tasksContainer);
-    
+
     loadTasks();
   }
 }
@@ -98,12 +98,12 @@ function loadProjects() {
     projectList.removeChild(projectList.lastChild);
   }
   readAllProjects().forEach((project) => {
-    if(project != ""){
+    if (project != "") {
       const projectContainer = document.createElement("div");
       projectContainer.setAttribute("class", "projectContainer");
 
       const newProjectItem = document.createElement("li");
-      newProjectItem.addEventListener("click", loadDashboardFor);    
+      newProjectItem.addEventListener("click", loadDashboardFor);
       newProjectItem.textContent = project;
       projectContainer.appendChild(newProjectItem);
 
@@ -115,8 +115,7 @@ function loadProjects() {
       projectContainer.appendChild(RemoveProjectButton);
 
       projectList.appendChild(projectContainer);
-
-    }    
+    }
   });
 }
 
@@ -150,8 +149,6 @@ function loadTasks() {
     ///
     taskDescrip.value = taskObject.description ? taskObject.description : "";
 
-
-    
     taskbox.appendChild(taskDescrip);
 
     const dueDate = document.createElement("input");
@@ -191,14 +188,14 @@ function loadTasks() {
     checkTask.addEventListener("change", insertParamsV2);
     //
     taskbox.appendChild(checkTask);
- 
+
     const RemoveTaskButton = document.createElement("button");
     RemoveTaskButton.setAttribute("class", "RemoveTaskButton");
     RemoveTaskButton.textContent = "🗑️";
     RemoveTaskButton.project = project;
     RemoveTaskButton.task = taskObject.title;
     RemoveTaskButton.addEventListener("click", removeTaskCall);
-    taskbox.appendChild(RemoveTaskButton); 
+    taskbox.appendChild(RemoveTaskButton);
 
     tasksContainer.appendChild(taskbox);
   });
@@ -213,18 +210,18 @@ function insertParamsV2(e) {
   addParametersV2(project, task, param, value, checked);
 }
 
-function removeTaskCall(e){
+function removeTaskCall(e) {
   const project = e.currentTarget.project;
   const task = e.currentTarget.task;
-  removeTask (project,task);
+  removeTask(project, task);
   loadDashboard(project);
 }
 
-function removeProjectCall(e){
+function removeProjectCall(e) {
   const project = e.currentTarget.project;
   RemoveProject(project);
   loadProjects();
-  if (getProject() ==  project){    
+  if (getProject() == project) {
     loadDashboard();
   }
 }
