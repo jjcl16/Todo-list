@@ -23,11 +23,4 @@ export default class Task {
   setCheck(check) {
     this.check = check;
   }
-
-  setParameters(description, dueDate, priority, check) {
-    this.description = description;
-    this.dueDate = dueDate;
-    this.priority = priority;
-    this.check = check;
-  }
 }

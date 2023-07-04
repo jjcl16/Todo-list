@@ -1,13 +1,10 @@
-//import _ from 'lodash';
 import Task from "./task";
-//import { setParameters } from "./task";
 import {
   addNewProject,
   readAllProjects,
   addNewTask,
   readAllTask,
   removeTask,
-  addParameters,
   addParametersV2,
   RemoveProject
 } from "./localStorageOperations";
@@ -17,28 +14,8 @@ const projectList = document.querySelector(".projectList");
 const newProjectName = document.querySelector("#ProjectName");
 const dashboard = document.querySelector("#board");
 
-//const projectTitle = document.querySelector("#projectTitle");
-//const taskName = document.querySelector("#taskName");
-
-/*
-const texto = document.createElement("div");
-texto.textContent = "Hola";
-document.body.appendChild(texto);
-*/
-
 const buttonAddNewProjects = document.querySelector("#projects");
 buttonAddNewProjects.addEventListener("click", insertNewProject);
-/*
-const insertTaskButton = document.querySelector("#insertTask");
-insertTaskButton.textContent = "Insert task";
-insertTaskButton.addEventListener("click", insertTask);
-
-const insertTaskParametersButton = document.querySelector(
-  "#insertTaskParameters"
-);
-insertTaskParametersButton.textContent = "Insertar parametros";
-insertTaskParametersButton.addEventListener("click", insertParams);
-*/
 loadProjects();
 
 function getTask() {
@@ -61,13 +38,6 @@ function insertTask() {
   loadDashboard(project);
 }
 
-function insertParams(e) {
-  console.log(e.currentTarget.taskDescription);
-  console.log(e.currentTarget.taskUpdate);
-  const project = getProject();
-  //addParameters(project, taskToUpdate.title , taskToUpdate.description , taskToUpdate.date , taskToUpdate.priority , taskToUpdate.check);
-}
-
 function insertNewProject() {
   let name = newProjectName.value;  
   if (name) {
@@ -85,11 +55,15 @@ function loadDashboard(projectName) {
     dashboard.removeChild(dashboard.lastChild);
   }
   if (projectName){
+    const newTaskContainer = document.createElement("div");
+    newTaskContainer.setAttribute("id", "newTaskContainer");
+
     const projectTitle = document.createElement("div");
     projectTitle.setAttribute("id", "projectTitle");
 
     const titleLabel = document.createElement("label");
     titleLabel.setAttribute("for", "taskName");
+    titleLabel.setAttribute("id", "labelTaskName");
     titleLabel.textContent = "Task Name:";
 
     const taskName = document.createElement("input");
@@ -98,16 +72,22 @@ function loadDashboard(projectName) {
 
     const insertTaskButton = document.createElement("button");
     insertTaskButton.setAttribute("id", "insertTask");
-    insertTaskButton.textContent = "Insert Task";
-    insertTaskButton.addEventListener("click", insertTask);
-    
+    insertTaskButton.textContent = "✚";
+    insertTaskButton.addEventListener("click", insertTask);   
   
     projectTitle.textContent = projectName;
 
-    dashboard.appendChild(projectTitle);
-    dashboard.appendChild(titleLabel);
-    dashboard.appendChild(taskName);
-    dashboard.appendChild(insertTaskButton);
+    newTaskContainer.appendChild(projectTitle);
+    newTaskContainer.appendChild(titleLabel);
+    newTaskContainer.appendChild(taskName);
+    newTaskContainer.appendChild(insertTaskButton);
+
+    dashboard.appendChild(newTaskContainer);
+
+    const tasksContainer = document.createElement("div");
+    tasksContainer.setAttribute("id", "tasksContainer");
+
+    dashboard.appendChild(tasksContainer);
     
     loadTasks();
   }
@@ -119,18 +99,23 @@ function loadProjects() {
   }
   readAllProjects().forEach((project) => {
     if(project != ""){
+      const projectContainer = document.createElement("div");
+      projectContainer.setAttribute("class", "projectContainer");
+
       const newProjectItem = document.createElement("li");
-      newProjectItem.value = project;
       newProjectItem.addEventListener("click", loadDashboardFor);    
       newProjectItem.textContent = project;
-      projectList.appendChild(newProjectItem);
+      projectContainer.appendChild(newProjectItem);
 
       const RemoveProjectButton = document.createElement("button");
       RemoveProjectButton.setAttribute("id", "RemoveProjectButton");
       RemoveProjectButton.textContent = "🗑️";
       RemoveProjectButton.project = project;
       RemoveProjectButton.addEventListener("click", removeProjectCall);
-      projectList.appendChild(RemoveProjectButton);
+      projectContainer.appendChild(RemoveProjectButton);
+
+      projectList.appendChild(projectContainer);
+
     }    
   });
 }
@@ -139,11 +124,10 @@ function loadTasks() {
   let project = getProject();
   let tasks = readAllTask(project);
 
-
+  const tasksContainer = document.querySelector("#tasksContainer");
 
   tasks.forEach((task) => {
     const taskObject = Object.assign(new Task(), JSON.parse(task));
-    console.log(taskObject);
     const taskbox = document.createElement("div");
     taskbox.classList.add("taskBox");
 
@@ -151,11 +135,13 @@ function loadTasks() {
     Tasktitle.textContent = taskObject.title;
     taskbox.appendChild(Tasktitle);
 
-    const taskDescrip = document.createElement("input");
+    const taskDescrip = document.createElement("textarea");
     taskDescrip.classList.add("taskDescrip");
     taskDescrip.setAttribute("type", "text");
     taskDescrip.setAttribute("placeholder", "Description");
     taskDescrip.setAttribute("maxlength", "140");
+    taskDescrip.setAttribute("cols", "40");
+    taskDescrip.setAttribute("rows", "4");
     ////
     taskDescrip.param = "description";
     taskDescrip.project = project;
@@ -163,10 +149,13 @@ function loadTasks() {
     taskDescrip.addEventListener("change", insertParamsV2);
     ///
     taskDescrip.value = taskObject.description ? taskObject.description : "";
+
+
+    
     taskbox.appendChild(taskDescrip);
 
     const dueDate = document.createElement("input");
-    dueDate.classList.add("taskDescrip");
+    dueDate.classList.add("dueDate");
     dueDate.setAttribute("type", "date");
     dueDate.value = taskObject.dueDate ? taskObject.dueDate : "";
     //
@@ -180,7 +169,8 @@ function loadTasks() {
     const priority = document.createElement("input");
     priority.classList.add("priority");
     priority.setAttribute("type", "text");
-    priority.setAttribute("maxlength", "140");
+    priority.setAttribute("maxlength", "15");
+    priority.setAttribute("placeholder", "Priority");
     priority.value = taskObject.priority ? taskObject.priority : "";
     //
     priority.param = "priority";
@@ -193,7 +183,6 @@ function loadTasks() {
     const checkTask = document.createElement("input");
     checkTask.classList.add("check");
     checkTask.setAttribute("type", "checkbox");
-    checkTask.setAttribute("maxlength", "140");
     checkTask.checked = taskObject.check;
     //
     checkTask.param = "check";
@@ -202,19 +191,16 @@ function loadTasks() {
     checkTask.addEventListener("change", insertParamsV2);
     //
     taskbox.appendChild(checkTask);
-
-
  
     const RemoveTaskButton = document.createElement("button");
-    RemoveTaskButton.setAttribute("id", "RemoveTaskButton");
+    RemoveTaskButton.setAttribute("class", "RemoveTaskButton");
     RemoveTaskButton.textContent = "🗑️";
     RemoveTaskButton.project = project;
     RemoveTaskButton.task = taskObject.title;
     RemoveTaskButton.addEventListener("click", removeTaskCall);
-    taskbox.appendChild(RemoveTaskButton);
-  
+    taskbox.appendChild(RemoveTaskButton); 
 
-    dashboard.appendChild(taskbox);
+    tasksContainer.appendChild(taskbox);
   });
 }
 
@@ -227,7 +213,6 @@ function insertParamsV2(e) {
   addParametersV2(project, task, param, value, checked);
 }
 
-
 function removeTaskCall(e){
   const project = e.currentTarget.project;
   const task = e.currentTarget.task;
@@ -239,9 +224,7 @@ function removeProjectCall(e){
   const project = e.currentTarget.project;
   RemoveProject(project);
   loadProjects();
-  if (getProject() ==  project){
-    const projects = readAllProjects();
-    //loadDashboard(projects[projects.length-1]);
+  if (getProject() ==  project){    
     loadDashboard();
   }
 }
